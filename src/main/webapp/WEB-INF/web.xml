@@ -1,0 +1,40 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+
+  <servlet>
+    <servlet-name>MyServlet</servlet-name>
+    <servlet-class>servlet.MyServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>AuthServlet</servlet-name>
+    <servlet-class>servlet.AuthServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>CategoryServlet</servlet-name>
+    <servlet-class>servlet.categories.CategoryServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>SubCategoryServlet</servlet-name>
+    <servlet-class>servlet.categories.SubCategoryServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MyServlet</servlet-name>
+    <url-pattern>/hello</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AuthServlet</servlet-name>
+    <url-pattern>/api/auth/*"</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CategoryServlet</servlet-name>
+    <url-pattern>/api/categories/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SubCategoryServlet</servlet-name>
+    <url-pattern>/api/subcategories/*</url-pattern>
+  </servlet-mapping>
+</web-app>
