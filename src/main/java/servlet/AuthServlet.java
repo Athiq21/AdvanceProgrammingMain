@@ -609,6 +609,7 @@ package servlet;
 
 import org.json.JSONObject;
 import services.AuthService;
+import services.EmailService;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
@@ -624,7 +625,7 @@ public class AuthServlet extends HttpServlet {
         String path = req.getPathInfo();
 
         if (path == null || path.isEmpty()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid API endpoint");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "NO API");
             return;
         }
 
@@ -644,7 +645,7 @@ public class AuthServlet extends HttpServlet {
                 handleOtpResend(req, resp);
                 break;
             default:
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "NO API");
         }
     }
 
@@ -678,7 +679,7 @@ public class AuthServlet extends HttpServlet {
         JSONObject jsonObject = getJsonFromRequest(req);
         String email = jsonObject.optString("email");
 
-
+        AuthService.handleOTPResends(email, resp);
     }
 
     private JSONObject getJsonFromRequest(HttpServletRequest req) throws IOException {

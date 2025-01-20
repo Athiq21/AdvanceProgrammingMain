@@ -97,12 +97,11 @@ public class EmailService {
                         "</html>";
 
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(senderEmail)); // Set the sender email address
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail)); // Set the recipient
-        message.setSubject(subject); // Set the subject
-        message.setContent(body, "text/html"); // Set the email content as HTML
+        message.setFrom(new InternetAddress(senderEmail));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+        message.setSubject(subject);
+        message.setContent(body, "text/html");
 
-        // Send the email
         Transport.send(message);
     }
 
@@ -197,12 +196,11 @@ public class EmailService {
                         "</html>";
 
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(senderEmail)); // Set the sender email address
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail)); // Set the recipient
+        message.setFrom(new InternetAddress(senderEmail));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
         message.setSubject(subject); // Set the subject
         message.setContent(body, "text/html"); // Set the email content as HTML
 
-        // Send the email
         Transport.send(message);
     }
 

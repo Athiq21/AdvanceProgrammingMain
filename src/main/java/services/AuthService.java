@@ -1,12 +1,15 @@
 package services;
 
+import encryption.EncryptionHelperExt;
 import util.RandomPasswordUtil;
 import jic.DBConnection;
 import services.EmailService;
 import model.User;
 import org.json.JSONObject;
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Date;
@@ -16,9 +19,65 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class AuthService {
 
     private static final String SECRET_KEY = "73c73aa573911d7c35832470160e1ac92e4605b4ceb0e9a7ba082f68198446cf21c1202db58f759fae0ee96f337130c39e56d5092429ddb0b769cda0c2758d7304b2252f4bedf755df92419aa4ee13f3c0e86be8add3b26c3b019ec7a49cb3afa3a40c8574ff474a5073a4750a87e313f62dff8311d319043fc9b15df27b1ba95c231d36c38cee2cdbc5d98a0f8da0c805447728d3422238491e083b682eb6d48b0f6003dee3e9c14f6578fcff2fa2586e4bb562b6fd41534b62e85c1e32812045462999d8553b624c9cdcccb28626bbc99167a550cb468d900adf06a985b811b73ad202cab100ac58fb9f8b36133e8630220d39b39644b3436dde3e0589fa76";
+//    Connection conn = null;
+//    ResultSet rs= null;
+//    private PreparedStatement stmt = null;
+
+
+    public static void handleOTPResends(String email, HttpServletResponse resp) throws IOException {
+        if (email.isEmpty()) {
+            sendErrorResponse(resp, "Email is required to resend OTP.");
+            return;
+        }
+
+        try {Connection conn = DBConnection.getConnection();
+            if (conn == null || conn.isClosed()) {
+                sendErrorResponse(resp, "Database connection failed. Please try again later.");
+                return;
+            }
+
+            String query = "SELECT otp, otpExpiration, isActivated FROM user WHERE email = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String storedOtp = rs.getString("otp");
+                Timestamp storedOtpExpiration = rs.getTimestamp("otpExpiration");
+                int isActivated = rs.getInt("isActivated");
+
+                if (isActivated == 1) {
+                    sendErrorResponse(resp, "User is already activated. OTP is not needed.");
+                    return;
+                }
+
+                String newOtp = RandomPasswordUtil.generateOTP(6);
+                Timestamp newOtpExpiration = getOtpExpirationTime();
+
+                String updateQuery = "UPDATE user SET otp = ?, otpExpiration = ? WHERE email = ?";
+                stmt = conn.prepareStatement(updateQuery);
+                stmt.setString(1, newOtp);
+                stmt.setTimestamp(2, newOtpExpiration);
+                stmt.setString(3, email);
+                stmt.executeUpdate();
+
+                EmailService emailService = new EmailService();
+                try {
+                    emailService.resendOtpEmail(email, newOtp, newOtpExpiration);
+                    sendSuccessResponse(resp, "OTP resent successfully to your email.");
+                } catch (MessagingException e) {
+                    sendErrorResponse(resp, "Error while sending the OTP email: " + e.getMessage());
+                }
+            } else {
+                sendErrorResponse(resp, "User not found.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            sendErrorResponse(resp, "Error during OTP resend process: " + e.getMessage());
+        }
+    }
 
     public static void handleSignup(String email, String password, String firstName, String lastName, HttpServletResponse resp) throws IOException {
-        // Validate the input
         if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
             sendErrorResponse(resp, "Email, password, first name, and last name are required.");
             return;
@@ -35,14 +94,15 @@ public class AuthService {
                 return;
             }
 
+            String Upper2PW = EncryptionHelperExt.consistentHashPassword(password);
+
             String otp = RandomPasswordUtil.generateOTP(6);
             Timestamp otpExpiration = getOtpExpirationTime();
 
             int roleId = getRoleId(conn, "ROLE_USER");
 
-            insertUser(conn, email, password, firstName, lastName, otp, otpExpiration, roleId);
+            insertUser(conn, email, Upper2PW, firstName, lastName, otp, otpExpiration, roleId);
 
-            // Send OTP Email
             EmailService emailService = new EmailService();
             emailService.sendOtpEmail(email, otp, otpExpiration);
 
@@ -79,15 +139,20 @@ public class AuthService {
                     int roleId = rs.getInt("role_id");
                     String roleName = rs.getString("authority");
 
-                    if (storedPassword.equals(password)) {
-                        if (isActivated) {
-                            String accessToken = generateJwtToken(userId, email);
-                            sendSuccessResponseWithToken(resp, accessToken, userId, email, firstName, lastName, roleId, roleName);
+                    try {
+                        String hashedPassword = EncryptionHelperExt.consistentHashPassword(password);
+                        if (hashedPassword != null && hashedPassword.equals(storedPassword)) {
+                            if (isActivated) {
+                                String accessToken = generateJwtToken(userId, email);
+                                sendSuccessResponseWithToken(resp, accessToken, userId, email, firstName, lastName, roleId, roleName);
+                            } else {
+                                sendErrorResponse(resp, "Account not activated. Please verify your email with the OTP.");
+                            }
                         } else {
-                            sendErrorResponse(resp, "Account not activated. Please verify your email with the OTP.");
+                            sendErrorResponse(resp, "Invalid email or password.");
                         }
-                    } else {
-                        sendErrorResponse(resp, "Invalid email or password.");
+                    } catch (Exception e) {
+                        sendErrorResponse(resp, "Error during password hashing: " + e.getMessage());
                     }
                 } else {
                     sendErrorResponse(resp, "User not found.");
@@ -99,6 +164,7 @@ public class AuthService {
             sendErrorResponse(resp, "Error during sign-in process: " + e.getMessage());
         }
     }
+
 
     public static void handleOtpVerification(String email, String enteredOtp, HttpServletResponse resp) throws IOException {
         try (Connection conn = DBConnection.getConnection()) {
@@ -149,11 +215,11 @@ public class AuthService {
         }
     }
 
-    private static void insertUser(Connection conn, String email, String password, String firstName, String lastName, String otp, Timestamp otpExpiration, int roleId) throws SQLException {
+    private static void insertUser(Connection conn, String email, String Upper2PW, String firstName, String lastName, String otp, Timestamp otpExpiration, int roleId) throws SQLException {
         String query = "INSERT INTO user (email, password, firstName, lastName, otp, otpExpiration, role_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, email);
-            stmt.setString(2, password);
+            stmt.setString(2, Upper2PW);
             stmt.setString(3, firstName);
             stmt.setString(4, lastName);
             stmt.setString(5, otp);

@@ -1,7 +1,6 @@
 package services;
 import jic.DBConnection;
 import model.Category;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
