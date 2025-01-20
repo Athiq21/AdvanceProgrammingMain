@@ -277,19 +277,19 @@ public class AuthService {
         resp.getWriter().write(message );
     }
 
-    private static void sendSuccessResponseWithToken(HttpServletResponse resp, String accessToken, int userId, String email, String firstName, String lastName, int roleId, String roleName) throws IOException {
+    private static void sendSuccessResponseWithToken(HttpServletResponse resp, String accessToken, int id, String email, String firstName, String lastName, int roleId, String roleName) throws IOException {
 //        resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/json");
         String jsonResponse = "{"
                 + "\"message\": \"Sign-in successful\","
-                + "\"access_token\": \"" + accessToken + "\","
+                + "\"accessToken\": \"" + accessToken + "\","
                 + "\"user\": {"
-                + "\"id\": " + userId + ","
+                + "\"id\": " + id + ","
                 + "\"email\": \"" + email + "\","
-                + "\"first_name\": \"" + firstName + "\","
-                + "\"last_name\": \"" + lastName + "\","
-                + "\"role_id\": " + roleId + ","
-                + "\"role\": \"" + roleName + "\""
+                + "\"firstName\": \"" + firstName + "\","
+                + "\"lastName\": \"" + lastName + "\","
+                + "\"roleId\": " + roleId + ","
+                + "\"roleName\": \"" + roleName + "\""
                 + "}"
                 + "}";
         resp.getWriter().write(jsonResponse);
