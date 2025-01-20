@@ -350,7 +350,7 @@ import java.sql.SQLException;
 public class SubCategoryServlet extends HttpServlet {
     private PreparedStatement stmt = null;
     private ResultSet rs = null;
-    private Connection conn = null;
+    Connection c = DBConnection.getInstance().getConnection();
 
 
     @Override
@@ -464,14 +464,13 @@ public class SubCategoryServlet extends HttpServlet {
         }
 
         try {
-            conn = DBConnection.getConnection();
-            if (conn == null || conn.isClosed()) {
+            if (c == null || c.isClosed()) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database connection failed");
                 return;
             }
 
             String query = "INSERT INTO sub_category (name, category_id) VALUES (?, ?)";
-            stmt = conn.prepareStatement(query);
+            stmt = c.prepareStatement(query);
             stmt.setString(1, name);
             stmt.setInt(2, categoryId);
 
@@ -517,14 +516,13 @@ public class SubCategoryServlet extends HttpServlet {
         }
 
         try {
-            conn = DBConnection.getConnection();
-            if (conn == null || conn.isClosed()) {
+            if (c == null || c.isClosed()) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database connection failed");
                 return;
             }
 
             String query = "UPDATE sub_category SET name = ?, category_id = ? WHERE id = ?";
-            stmt = conn.prepareStatement(query);
+            stmt = c.prepareStatement(query);
             stmt.setString(1, name);
             stmt.setInt(2, categoryId);
             stmt.setInt(3, Integer.parseInt(id));
@@ -547,14 +545,13 @@ public class SubCategoryServlet extends HttpServlet {
 
     private void deleteSubCategory(HttpServletRequest req, HttpServletResponse resp, String id) throws IOException {
         try {
-            conn = DBConnection.getConnection();
-            if (conn == null || conn.isClosed()) {
+            if (c == null || c.isClosed()) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database connection failed");
                 return;
             }
 
             String query = "DELETE FROM sub_category WHERE id = ?";
-            stmt = conn.prepareStatement(query);
+            stmt = c.prepareStatement(query);
             stmt.setInt(1, Integer.parseInt(id));
 
             int rowsAffected = stmt.executeUpdate();
@@ -575,14 +572,13 @@ public class SubCategoryServlet extends HttpServlet {
 
     private void getAllSubCategories(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            conn = DBConnection.getConnection();
-            if (conn == null || conn.isClosed()) {
+            if (c == null || c.isClosed()) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database connection failed");
                 return;
             }
 
             String query = "SELECT id, name, category_id FROM sub_category";
-            stmt = conn.prepareStatement(query);
+            stmt = c.prepareStatement(query);
             rs = stmt.executeQuery();
 
             JSONArray subcategories = new JSONArray();
@@ -613,14 +609,13 @@ public class SubCategoryServlet extends HttpServlet {
 
     private void getSubCategoriesByCategoryId(HttpServletRequest req, HttpServletResponse resp, int categoryId) throws IOException {
         try {
-            conn = DBConnection.getConnection();
-            if (conn == null || conn.isClosed()) {
+            if (c == null || c.isClosed()) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database connection failed");
                 return;
             }
 
             String query = "SELECT id, name FROM sub_category WHERE category_id = ?";
-            stmt = conn.prepareStatement(query);
+            stmt = c.prepareStatement(query);
             stmt.setInt(1, categoryId);
             rs = stmt.executeQuery();
 
@@ -652,14 +647,14 @@ public class SubCategoryServlet extends HttpServlet {
 
     private void getAllSubCategory(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            conn = DBConnection.getConnection();
-            if (conn == null || conn.isClosed()) {
+
+            if (c == null || c.isClosed()) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database connection failed");
                 return;
             }
 
             String query = "SELECT id, name, category_id FROM sub_category";  // Query to fetch all subcategories
-            stmt = conn.prepareStatement(query);
+            stmt = c.prepareStatement(query);
             rs = stmt.executeQuery();
 
             JSONArray subcategories = new JSONArray();
@@ -692,7 +687,7 @@ public class SubCategoryServlet extends HttpServlet {
         try {
             if (stmt != null) stmt.close();
             if (rs != null) rs.close();
-            if (conn != null) conn.close();
+            if (c != null) c.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

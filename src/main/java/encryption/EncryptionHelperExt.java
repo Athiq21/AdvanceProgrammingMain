@@ -16,15 +16,13 @@ public class EncryptionHelperExt {
                 hash = digest.digest(hashString.getBytes());
                 hashString = Base64.getEncoder().encodeToString(hash);
             }
-
-            return hashString;
+ return hashString;
 
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return null;
         }
     }
-
     public static String hashPassword(String password) {
         return consistentHashPassword(password);
     }
