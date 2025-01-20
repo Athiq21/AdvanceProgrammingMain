@@ -17,10 +17,10 @@
     <servlet-name>CategoryServlet</servlet-name>
     <servlet-class>servlet.categories.CategoryServlet</servlet-class>
   </servlet>
-  <servlet>
-    <servlet-name>SubCategoryServlet</servlet-name>
-    <servlet-class>servlet.categories.SubCategoryServlet</servlet-class>
-  </servlet>
+<!--  <servlet>-->
+<!--    <servlet-name>SubCategoryServlet</servlet-name>-->
+<!--    <servlet-class>servlet.categories.SubCategoryServlet</servlet-class>-->
+<!--  </servlet>-->
   <servlet-mapping>
     <servlet-name>MyServlet</servlet-name>
     <url-pattern>/hello</url-pattern>
@@ -33,8 +33,8 @@
     <servlet-name>CategoryServlet</servlet-name>
     <url-pattern>/api/categories/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>SubCategoryServlet</servlet-name>
-    <url-pattern>/api/subcategories/*</url-pattern>
-  </servlet-mapping>
+<!--  <servlet-mapping>-->
+<!--    <servlet-name>SubCategoryServlet</servlet-name>-->
+<!--    <url-pattern>/api/subcategories/*</url-pattern>-->
+<!--  </servlet-mapping>-->
 </web-app>

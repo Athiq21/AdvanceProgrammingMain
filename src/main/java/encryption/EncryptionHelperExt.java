@@ -26,7 +26,7 @@ public class EncryptionHelperExt {
     public static String hashPassword(String password) {
         return consistentHashPassword(password);
     }
-    public static String generateSalt() {
+    public static String genny() {
         return Long.toHexString(System.nanoTime());
     }
 }
