@@ -8,12 +8,12 @@ public class EncryptionHelperExt {
 
     public static String consistentHashPassword(String password) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(password.getBytes());
+            MessageDigest nopeek = MessageDigest.getInstance("SHA-256");
+            byte[] hash = nopeek.digest(password.getBytes());
             String hashString = Base64.getEncoder().encodeToString(hash);
             for (int i = 0; i < 5; i++) {
-                digest.reset();
-                hash = digest.digest(hashString.getBytes());
+                nopeek.reset();
+                hash = nopeek.digest(hashString.getBytes());
                 hashString = Base64.getEncoder().encodeToString(hash);
             }
  return hashString;
@@ -29,4 +29,12 @@ public class EncryptionHelperExt {
     public static String genny() {
         return Long.toHexString(System.nanoTime());
     }
+
+    public void main(String args[]){
+        System.out.println(consistentHashPassword(args[0]));
+        System.out.println(hashPassword("Batman"));
+
+//        return genny();
+    }
+
 }

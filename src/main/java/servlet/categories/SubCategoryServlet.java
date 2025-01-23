@@ -707,6 +707,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import model.SubCategory;
 
 @WebServlet("/api/subcategories/*")
 public class SubCategoryServlet extends HttpServlet {
@@ -727,7 +735,8 @@ public class SubCategoryServlet extends HttpServlet {
         String path = req.getPathInfo();
 
         if (path == null || path.isEmpty() || path.equals("/")) {
-            sa.getAllSubCategory(req, resp);
+            // Call getAllSubCategory, but do not expect a return value
+            sa.getAllSubCategory(req, resp);  // This method will write the response directly
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
         }
@@ -823,4 +832,6 @@ public class SubCategoryServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format");
         }
     }
+
+
 }

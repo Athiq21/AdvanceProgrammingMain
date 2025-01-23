@@ -10,17 +10,23 @@ import java.io.IOException;
 public class Validator implements SubCategoryServiceImpl {
     private SubCategoryServiceImpl subCategoryService;
 
+    protected SubCategoryServiceImpl wrappedService;
+
+
     public Validator(SubCategoryServiceImpl subCategoryService) {
         this.subCategoryService = subCategoryService;
     }
 
+    private void validateRequestMethod(HttpServletRequest req, HttpServletResponse resp, String expectedMethod) throws IOException {
+        if (!req.getMethod().equals(expectedMethod)) {
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Invalid request method. Expected: " + expectedMethod);
+        }
+    }
+
     @Override
     public void getAllSubCategory(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        if (req.getMethod().equals("GET")) {
-            subCategoryService.getAllSubCategory(req, resp);
-        } else {
-            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Invalid request method");
-        }
+        validateRequestMethod(req, resp, "GET"); // Validate request method
+        subCategoryService.getAllSubCategory(req, resp); // Delegate to the wrapped service
     }
 
     @Override

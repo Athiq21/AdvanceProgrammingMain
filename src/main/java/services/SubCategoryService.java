@@ -1,7 +1,9 @@
 package services;
 
 import Interface.SubCategoryServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jic.DBConnection;
+import model.SubCategory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,7 +15,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SubCategoryService implements SubCategoryServiceImpl {
     private PreparedStatement stmt = null;
@@ -22,6 +29,7 @@ public class SubCategoryService implements SubCategoryServiceImpl {
 
     @Override
     public void getAllSubCategory(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        List<SubCategory> subCategoryList = new ArrayList<>();
         try {
             if (c == null || c.isClosed()) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database connection failed");
@@ -32,30 +40,41 @@ public class SubCategoryService implements SubCategoryServiceImpl {
             stmt = c.prepareStatement(query);
             rs = stmt.executeQuery();
 
-            JSONArray subcategories = new JSONArray();
-
+            // Collect the subcategories in the list
             while (rs.next()) {
-                JSONObject subcategory = new JSONObject();
-                subcategory.put("id", rs.getInt("id"));
-                subcategory.put("name", rs.getString("name"));
-                subcategory.put("category_id", rs.getInt("category_id"));
-
-                subcategories.put(subcategory);
+                SubCategory subCategory = new SubCategory();
+                subCategory.setId(rs.getInt("id"));
+                subCategory.setName(rs.getString("name"));
+                subCategory.setCategoryId(rs.getInt("category_id"));
+                subCategoryList.add(subCategory);
             }
 
-            if (subcategories.length() > 0) {
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.setContentType("application/json");
-                resp.getWriter().write(subcategories.toString());
-            } else {
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.getWriter().write("{\"message\": \"No subcategories found\"}");
-            }
+            // Use sendSubCategoryResponse to convert the list into Map format and send it as JSON response
+            sendSubCategoryResponse(resp, subCategoryList);
+
         } catch (Exception e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error during database operation: " + e.getMessage());
         } finally {
             closeResources();
         }
+    }
+
+    // Refactored sendSubCategoryResponse method to convert List<SubCategory> to a List<Map<String, Object>>
+    private void sendSubCategoryResponse(HttpServletResponse resp, List<SubCategory> subCategories) throws IOException {
+        // Convert the list of SubCategory objects to a list of maps
+        List<Map<String, Object>> response = subCategories.stream()
+                .map(sub -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", sub.getId());
+                    map.put("name", sub.getName());
+                    map.put("categoryId", sub.getCategoryId());
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        // Convert the list to JSON and send it as response
+        resp.setContentType("application/json");
+        resp.getWriter().write(new ObjectMapper().writeValueAsString(response));
     }
 
     @Override
