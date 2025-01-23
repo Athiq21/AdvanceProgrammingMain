@@ -707,14 +707,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import model.SubCategory;
 
 @WebServlet("/api/subcategories/*")
 public class SubCategoryServlet extends HttpServlet {
@@ -734,13 +726,34 @@ public class SubCategoryServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
 
+        // If the path is null or empty or is just "/"
         if (path == null || path.isEmpty() || path.equals("/")) {
-            // Call getAllSubCategory, but do not expect a return value
-            sa.getAllSubCategory(req, resp);  // This method will write the response directly
+            sa.getAllSubCategory(req, resp); // Fetch all subcategories
+        } else if (path.startsWith("/category/")) {
+            // Extract categoryId from the URL path (e.g., /category/{categoryId})
+            String categoryIdStr = path.substring("/category/".length());
+            try {
+                int categoryId = Integer.parseInt(categoryIdStr); // Parse category ID
+                sa.getSubCategoriesByCategoryId(req, resp, categoryId); // Fetch subcategories by category ID
+            } catch (NumberFormatException e) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid category ID format");
+            }
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
         }
     }
+
+
+//    @Override
+//    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+//        String path = req.getPathInfo();
+//
+//        if (path == null || path.isEmpty() || path.equals("/")) {
+//            sa.getAllSubCategory(req, resp);
+//        } else {
+//            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
+//        }
+//    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {

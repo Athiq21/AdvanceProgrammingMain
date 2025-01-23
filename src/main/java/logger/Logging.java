@@ -15,6 +15,13 @@ public class Logging implements SubCategoryServiceImpl {
     }
 
     @Override
+    public void getSubCategoriesByCategoryId(HttpServletRequest req, HttpServletResponse resp, int categoryId) throws IOException {
+        System.out.println("Request received for getAllSubCategory");
+        subCategoryService.getSubCategoriesByCategoryId(req, resp,categoryId);
+        System.out.println("Response sent for getAllSubCategory");
+    }
+
+    @Override
     public void getAllSubCategory(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         System.out.println("Request received for getAllSubCategory");
         subCategoryService.getAllSubCategory(req, resp);

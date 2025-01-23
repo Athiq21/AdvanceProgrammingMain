@@ -1,33 +1,66 @@
+//package model;
+//
+//public class SubCategory {
+//
+//    private int Id;
+//    private String Name;
+//
+//    private int CategoryId;
+//
+//    public int getId() {
+//        return Id;
+//    }
+//
+//    public void setId(int id) {
+//        Id = id;
+//    }
+//
+//    public String getName() {
+//        return Name;
+//    }
+//
+//    public void setName(String name) {
+//        Name = name;
+//    }
+//
+//    public int getCategoryId() {
+//        return CategoryId;
+//    }
+//
+//    public void setCategoryId(int categoryId) {
+//        CategoryId = categoryId;
+//    }
+//}
+
 package model;
 
 public class SubCategory {
 
-    private int Id;
-    private String Name;
-
-    private int CategoryId;
+    private int id;
+    private String name;
+    private Category category;
 
     public int getId() {
-        return Id;
+        return id;
     }
 
     public void setId(int id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
-    public int getCategoryId() {
-        return CategoryId;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategoryId(int categoryId) {
-        CategoryId = categoryId;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

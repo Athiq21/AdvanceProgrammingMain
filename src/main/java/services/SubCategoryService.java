@@ -3,6 +3,7 @@ package services;
 import Interface.SubCategoryServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jic.DBConnection;
+import model.Category;
 import model.SubCategory;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,7 +29,7 @@ public class SubCategoryService implements SubCategoryServiceImpl {
     Connection c = DBConnection.getInstance().getConnection();
 
     @Override
-    public void getAllSubCategory(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void getSubCategoriesByCategoryId(HttpServletRequest req, HttpServletResponse resp, int categoryId) throws IOException {
         List<SubCategory> subCategoryList = new ArrayList<>();
         try {
             if (c == null || c.isClosed()) {
@@ -36,8 +37,12 @@ public class SubCategoryService implements SubCategoryServiceImpl {
                 return;
             }
 
-            String query = "SELECT id, name, category_id FROM sub_category";
+            String query = "SELECT sc.id, sc.name, sc.category_id, c.name AS category_name " +
+                    "FROM sub_category sc " +
+                    "JOIN category c ON sc.category_id = c.id " +
+                    "WHERE sc.category_id = ?";
             stmt = c.prepareStatement(query);
+            stmt.setInt(1, categoryId);
             rs = stmt.executeQuery();
 
             // Collect the subcategories in the list
@@ -45,11 +50,17 @@ public class SubCategoryService implements SubCategoryServiceImpl {
                 SubCategory subCategory = new SubCategory();
                 subCategory.setId(rs.getInt("id"));
                 subCategory.setName(rs.getString("name"));
-                subCategory.setCategoryId(rs.getInt("category_id"));
+
+                Category category = new  Category(rs.getInt("category_id"), rs.getString("category_name"));
+                category.setId(rs.getInt("category_id"));
+                category.setName(rs.getString("category_name"));
+
+                subCategory.setCategory(category);
+
                 subCategoryList.add(subCategory);
             }
 
-            // Use sendSubCategoryResponse to convert the list into Map format and send it as JSON response
+            // Send the list of subcategories as JSON response
             sendSubCategoryResponse(resp, subCategoryList);
 
         } catch (Exception e) {
@@ -59,7 +70,46 @@ public class SubCategoryService implements SubCategoryServiceImpl {
         }
     }
 
-    // Refactored sendSubCategoryResponse method to convert List<SubCategory> to a List<Map<String, Object>>
+    @Override
+    public void getAllSubCategory(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        List<SubCategory> subCategoryList = new ArrayList<>();
+        try {
+            if (c == null || c.isClosed()) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database connection failed");
+                return;
+            }
+
+            // Query to get subcategories with category details
+            String query = "SELECT sc.id, sc.name, sc.category_id, c.name AS category_name " +
+                    "FROM sub_category sc " +
+                    "JOIN category c ON sc.category_id = c.id";
+            stmt = c.prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                SubCategory subCategory = new SubCategory();
+                subCategory.setId(rs.getInt("id"));
+                subCategory.setName(rs.getString("name"));
+
+                Category category = new  Category(rs.getInt("category_id"), rs.getString("category_name"));
+                category.setId(rs.getInt("category_id"));
+                category.setName(rs.getString("category_name"));
+
+                subCategory.setCategory(category);
+
+                subCategoryList.add(subCategory);
+            }
+
+            // Send the list of subcategories as JSON response
+            sendSubCategoryResponse(resp, subCategoryList);
+
+        } catch (Exception e) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error during database operation: " + e.getMessage());
+        } finally {
+            closeResources();
+        }
+    }
+
     private void sendSubCategoryResponse(HttpServletResponse resp, List<SubCategory> subCategories) throws IOException {
         // Convert the list of SubCategory objects to a list of maps
         List<Map<String, Object>> response = subCategories.stream()
@@ -67,7 +117,16 @@ public class SubCategoryService implements SubCategoryServiceImpl {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", sub.getId());
                     map.put("name", sub.getName());
-                    map.put("categoryId", sub.getCategoryId());
+
+                    // Add the full category object in the response
+                    Category category = sub.getCategory();
+                    if (category != null) {
+                        Map<String, Object> categoryMap = new HashMap<>();
+                        categoryMap.put("id", category.getId());
+                        categoryMap.put("name", category.getName());
+                        map.put("category", categoryMap);  // Add category object to subcategory map
+                    }
+
                     return map;
                 })
                 .collect(Collectors.toList());
@@ -76,6 +135,7 @@ public class SubCategoryService implements SubCategoryServiceImpl {
         resp.setContentType("application/json");
         resp.getWriter().write(new ObjectMapper().writeValueAsString(response));
     }
+
 
     @Override
     public void addSubCategory(HttpServletRequest req, HttpServletResponse resp) throws IOException {

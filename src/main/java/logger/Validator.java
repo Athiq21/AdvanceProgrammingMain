@@ -24,6 +24,12 @@ public class Validator implements SubCategoryServiceImpl {
     }
 
     @Override
+    public void getSubCategoriesByCategoryId(HttpServletRequest req, HttpServletResponse resp, int categoryId) throws IOException {
+        validateRequestMethod(req, resp, "GET");
+        subCategoryService.getSubCategoriesByCategoryId(req, resp,categoryId);
+    }
+
+    @Override
     public void getAllSubCategory(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         validateRequestMethod(req, resp, "GET"); // Validate request method
         subCategoryService.getAllSubCategory(req, resp); // Delegate to the wrapped service
