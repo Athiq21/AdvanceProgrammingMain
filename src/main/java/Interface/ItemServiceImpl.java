@@ -1,0 +1,15 @@
+package services;
+
+import model.Item;
+
+import java.io.InputStream;
+import java.util.List;
+
+public interface ItemServiceImpl {
+    Item saveItem(Item item);
+//    Item saveItem(Item item, InputStream imageInputStream, String imageName);
+//    Item getItem(Long id);
+//    List<Item> getAllItems();
+//    Item updateItem(Item item);
+//    boolean deleteItem(Long id);
+}

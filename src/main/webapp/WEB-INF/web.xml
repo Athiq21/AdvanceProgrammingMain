@@ -1,8 +1,15 @@
+<!--<!DOCTYPE web-app PUBLIC-->
+<!-- "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"-->
+<!-- "http://java.sun.com/dtd/web-app_2_3.dtd" >-->
 <!DOCTYPE web-app PUBLIC
- "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
- "http://java.sun.com/dtd/web-app_2_3.dtd" >
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" >
 
-<web-app>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                             http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
   <display-name>Archetype Created Web Application</display-name>
 
   <servlet>
@@ -16,6 +23,16 @@
   <servlet>
     <servlet-name>CategoryServlet</servlet-name>
     <servlet-class>servlet.categories.CategoryServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ItemServlet</servlet-name>
+    <servlet-class>servlet.ItemServlet</servlet-class>
+    <multipart-config>
+      <location>/Users/athiq/Downloads/images</location>
+      <max-file-size>2097152</max-file-size> <!-- Max file size (2MB) -->
+      <max-request-size>4194304</max-request-size> <!-- Max request size (4MB) -->
+      <file-size-threshold>1048576</file-size-threshold> <!-- 1MB threshold before writing to disk -->
+    </multipart-config>
   </servlet>
 <!--  <servlet>-->
 <!--    <servlet-name>SubCategoryServlet</servlet-name>-->
@@ -32,6 +49,10 @@
   <servlet-mapping>
     <servlet-name>CategoryServlet</servlet-name>
     <url-pattern>/api/categories/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ItemServlet</servlet-name>
+    <url-pattern>/api/item/*</url-pattern>
   </servlet-mapping>
 <!--  <servlet-mapping>-->
 <!--    <servlet-name>SubCategoryServlet</servlet-name>-->
