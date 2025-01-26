@@ -5,6 +5,8 @@ import jic.DBConnection;
 
 import java.io.*;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,5 +49,33 @@ public class ItemService implements services.ItemServiceImpl {
             logger.log(Level.SEVERE, "Error saving item", e);
         }
         return item;
+    }
+
+    public List<Item> getAllItems() {
+        List<Item> items = new ArrayList<>();
+        String sql = "SELECT * FROM item";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Item item = new Item();
+                item.setId(rs.getLong("id"));
+                item.setName(rs.getString("name"));
+                item.setDescription(rs.getString("description"));
+                item.setColor(rs.getString("color"));
+                item.setMileage(rs.getString("mileage"));
+                item.setTransmission(rs.getString("transmission"));
+                item.setFuelType(rs.getString("fueltype"));
+                item.setCreatedBy(rs.getString("created_by"));
+                item.setPrice(rs.getString("price"));
+                item.setCategoryId(rs.getInt("category_id"));
+                item.setSubcategoryId(rs.getInt("subcategory_id"));
+                item.setImageBlob(rs.getString("image"));
+                items.add(item);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error fetching items", e);
+        }
+        return items;
     }
 }

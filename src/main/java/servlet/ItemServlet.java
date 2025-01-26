@@ -35,6 +35,9 @@ public class ItemServlet extends HttpServlet {
             case "/save":
                 saveItem(request, response);
                 break;
+//            case "/view":
+//                getAllItems(request, response);
+//                break;
             default:
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown action: " + path);
         }
@@ -42,7 +45,7 @@ public class ItemServlet extends HttpServlet {
 
     private void saveItem(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         // Handle multipart form data
-        Part imagePart = request.getPart("image"); 
+        Part imagePart = request.getPart("image"); // Use "image" as the key
         String name = request.getParameter("name");
         String description = request.getParameter("description");
         String color = request.getParameter("color");
@@ -50,6 +53,7 @@ public class ItemServlet extends HttpServlet {
         String transmission = request.getParameter("transmission");
         String fueltype = request.getParameter("fueltype");
         String price = request.getParameter("price");
+        String createdBy = request.getParameter("created_by");
         int categoryId = Integer.parseInt(request.getParameter("category_id"));
         int subcategoryId = Integer.parseInt(request.getParameter("subcategory_id"));
 
@@ -70,12 +74,17 @@ public class ItemServlet extends HttpServlet {
         item.setTransmission(transmission);
         item.setFuelType(fueltype);
         item.setPrice(price);
+        item.setCreatedBy(createdBy);
         item.setCategoryId(categoryId);
         item.setSubcategoryId(subcategoryId);
+
+        // Handle the image upload
         if (imagePart != null) {
             String imageBlob = saveImage(imagePart);
             item.setImageBlob(imageBlob);
         }
+
+        // Save the item to the database
         Item savedItem = itemService.saveItem(item);
 
         response.setContentType("application/json");
@@ -83,7 +92,7 @@ public class ItemServlet extends HttpServlet {
     }
 
     private String saveImage(Part imagePart) throws IOException {
-        String fileName = "athiqslocal_" + System.currentTimeMillis();
+        String fileName = "item_" + System.currentTimeMillis() + ".png";
         String folderPath = "/Users/athiq/Downloads/images";
         File outputFile = new File(folderPath, fileName);
 
@@ -98,4 +107,59 @@ public class ItemServlet extends HttpServlet {
 
         return fileName;
     }
+
+//    private void getAllItems(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        List<Item> items = itemService.getAllItems();
+//
+//        if (items.isEmpty()) {
+//            response.setStatus(HttpServletResponse.SC_NO_CONTENT); // 204 No Content
+//            response.getWriter().write("No items found");
+//        } else {
+//            response.setContentType("application/json");
+//            response.getWriter().write(new Gson().toJson(items));
+//        }
+//    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+
+        // Serve images
+        if (pathInfo != null && pathInfo.startsWith("/images/")) {
+            String filename = pathInfo.substring("/images/".length());
+            File imageFile = new File("/Users/athiq/Downloads/images", filename);
+
+            if (imageFile.exists()) {
+                response.setContentType("image/png");
+                try (InputStream inputStream = new FileInputStream(imageFile);
+                     OutputStream outputStream = response.getOutputStream()) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                }
+            } else {
+                System.err.println("Image not found: " + filename);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Image not found");
+            }
+        } else {
+            List<Item> items = itemService.getAllItems();
+
+            String baseUrl = request.getRequestURL().toString();
+            if (request.getPathInfo() != null) {
+                baseUrl = baseUrl.replace(request.getPathInfo(), "");
+            }
+
+            for (Item item : items) {
+                item.setImageBlob(baseUrl + "/images/" + item.getImageBlob());
+            }
+
+            response.setContentType("application/json");
+            response.getWriter().write(new Gson().toJson(items));
+        }
+    }
+
+
+
 }
