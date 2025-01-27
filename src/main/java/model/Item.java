@@ -15,10 +15,11 @@ public class Item {
     private String fueltype;
     private String price;
     private String imageBlob;
-    private String createdBy;
+    private int createdBy;
     private Long lastModifiedBy;
     private Date createdDatetime;
     private Date lastModifiedDatetime;
+    private String status;
     
     @SerializedName("category_id")
     private Integer categoryId;
@@ -28,6 +29,23 @@ public class Item {
 
     private Category category;
     private SubCategory subCategory;
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Long getId() {
         return id;
@@ -100,11 +118,11 @@ public class Item {
     public void setImageBlob(String imageBlob) {
         this.imageBlob = imageBlob;
     }
-    public String getCreatedBy() {
+    public int getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(int createdBy) {
         this.createdBy = createdBy;
     }
 

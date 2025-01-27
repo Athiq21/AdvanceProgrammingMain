@@ -9,7 +9,8 @@ public interface ItemServiceImpl {
     Item saveItem(Item item);
 //    Item saveItem(Item item, InputStream imageInputStream, String imageName);
 //    Item getItem(Long id);
-//    List<Item> getAllItems();
+    List<Item>getItemsBySubcategory(int subcategoryId);
+    List<Item> getAllItems();
 //    Item updateItem(Item item);
 //    boolean deleteItem(Long id);
 }

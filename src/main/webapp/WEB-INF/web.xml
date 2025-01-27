@@ -34,6 +34,17 @@
       <file-size-threshold>1048576</file-size-threshold> <!-- 1MB threshold before writing to disk -->
     </multipart-config>
   </servlet>
+
+  <servlet>
+    <servlet-name>OfferServlet</servlet-name>
+    <servlet-class>servlet.OfferServlet</servlet-class>
+    <multipart-config>
+      <location>/Users/athiq/Downloads/images</location>
+      <max-file-size>2097152</max-file-size>
+      <max-request-size>4194304</max-request-size>
+      <file-size-threshold>1048576</file-size-threshold>
+    </multipart-config>
+  </servlet>
 <!--  <servlet>-->
 <!--    <servlet-name>SubCategoryServlet</servlet-name>-->
 <!--    <servlet-class>servlet.categories.SubCategoryServlet</servlet-class>-->
@@ -53,6 +64,10 @@
   <servlet-mapping>
     <servlet-name>ItemServlet</servlet-name>
     <url-pattern>/api/item/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>OfferServlet</servlet-name>
+    <url-pattern>/api/offer/*</url-pattern>
   </servlet-mapping>
 <!--  <servlet-mapping>-->
 <!--    <servlet-name>SubCategoryServlet</servlet-name>-->

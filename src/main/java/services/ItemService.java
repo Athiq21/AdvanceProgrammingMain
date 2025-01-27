@@ -2,6 +2,7 @@ package services;
 
 import model.Item;
 import jic.DBConnection;
+import model.User;
 
 import java.io.*;
 import java.sql.*;
@@ -32,7 +33,7 @@ public class ItemService implements services.ItemServiceImpl {
             stmt.setString(5, item.getTransmission());
             stmt.setString(6, item.getFuelType());
             stmt.setString(7, item.getPrice());
-            stmt.setString(8, item.getCreatedBy());
+            stmt.setInt(8, item.getCreatedBy());
             stmt.setInt(9, item.getCategoryId());
             stmt.setInt(10, item.getSubcategoryId());
             stmt.setString(11, item.getImageBlob());
@@ -53,7 +54,10 @@ public class ItemService implements services.ItemServiceImpl {
 
     public List<Item> getAllItems() {
         List<Item> items = new ArrayList<>();
-        String sql = "SELECT * FROM item";
+        String sql = "SELECT i.*, u.id AS user_id, u.email AS user_email, u.firstName AS user_firstName, u.lastName AS user_lastName " +
+                "FROM item i " +
+                "LEFT JOIN user u ON i.created_by = u.id";
+
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -66,16 +70,65 @@ public class ItemService implements services.ItemServiceImpl {
                 item.setMileage(rs.getString("mileage"));
                 item.setTransmission(rs.getString("transmission"));
                 item.setFuelType(rs.getString("fueltype"));
-                item.setCreatedBy(rs.getString("created_by"));
+                item.setCreatedBy(rs.getInt("created_by"));
                 item.setPrice(rs.getString("price"));
                 item.setCategoryId(rs.getInt("category_id"));
                 item.setSubcategoryId(rs.getInt("subcategory_id"));
                 item.setImageBlob(rs.getString("image"));
+                item.setStatus(rs.getString("status"));
                 items.add(item);
+
+                User user = new User();
+                user.setId(rs.getInt("user_id"));
+                user.setEmail(rs.getString("user_email")); // Correct alias
+                user.setFirstName(rs.getString("user_firstName")); // Correct alias
+                user.setLastName(rs.getString("user_lastName"));
+                item.setUser(user);
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error fetching items", e);
         }
         return items;
     }
+
+    public List<Item> getItemsBySubcategory(int subcategoryId) {
+        List<Item> items = new ArrayList<>();
+        String sql = "SELECT * FROM item WHERE subcategory_id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, subcategoryId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Item item = new Item();
+                    item.setId(rs.getLong("id"));
+                    item.setName(rs.getString("name"));
+                    item.setDescription(rs.getString("description"));
+                    item.setColor(rs.getString("color"));
+                    item.setMileage(rs.getString("mileage"));
+                    item.setTransmission(rs.getString("transmission"));
+                    item.setFuelType(rs.getString("fueltype"));
+                    item.setCreatedBy(rs.getInt("created_by"));
+                    item.setPrice(rs.getString("price"));
+                    item.setCategoryId(rs.getInt("category_id"));
+                    item.setSubcategoryId(rs.getInt("subcategory_id"));
+                    item.setImageBlob(rs.getString("image"));
+                    item.setStatus(rs.getString("status"));
+                    items.add(item);
+
+                    User user = new User();
+                    user.setId(rs.getInt("user_id"));
+                    user.setEmail(rs.getString("user_email"));
+                    user.setFirstName(rs.getString("user_firstName"));
+                    user.setLastName(rs.getString("user_lastName"));
+                    item.setUser(user);
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error fetching items by subcategory", e);
+        }
+        return items;
+    }
+
+
 }

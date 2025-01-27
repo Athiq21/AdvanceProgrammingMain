@@ -53,16 +53,16 @@ public class ItemServlet extends HttpServlet {
         String transmission = request.getParameter("transmission");
         String fueltype = request.getParameter("fueltype");
         String price = request.getParameter("price");
-        String createdBy = request.getParameter("created_by");
+        int createdBy = Integer.parseInt(request.getParameter("created_by"));
         int categoryId = Integer.parseInt(request.getParameter("category_id"));
         int subcategoryId = Integer.parseInt(request.getParameter("subcategory_id"));
 
-        // Debug the received form data
         System.out.println("Received form data:");
         System.out.println("Name: " + name);
         System.out.println("Description: " + description);
         System.out.println("Category ID: " + categoryId);
         System.out.println("Subcategory ID: " + subcategoryId);
+        System.out.println("Created By: " + createdBy);
         System.out.println("Image Part: " + (imagePart != null ? imagePart.getSubmittedFileName() : "No image"));
 
         // Prepare the Item object
@@ -77,14 +77,12 @@ public class ItemServlet extends HttpServlet {
         item.setCreatedBy(createdBy);
         item.setCategoryId(categoryId);
         item.setSubcategoryId(subcategoryId);
-
-        // Handle the image upload
+    
         if (imagePart != null) {
             String imageBlob = saveImage(imagePart);
             item.setImageBlob(imageBlob);
         }
 
-        // Save the item to the database
         Item savedItem = itemService.saveItem(item);
 
         response.setContentType("application/json");
@@ -120,31 +118,129 @@ public class ItemServlet extends HttpServlet {
 //        }
 //    }
 
+//    @Override
+//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        String pathInfo = request.getPathInfo();
+//
+//        // Serve images
+//        if (pathInfo != null && pathInfo.startsWith("/images/")) {
+//            String filename = pathInfo.substring("/images/".length());
+//            File imageFile = new File("/Users/athiq/Downloads/images", filename);
+//
+//            if (imageFile.exists()) {
+//                response.setContentType("image/png");
+//                try (InputStream inputStream = new FileInputStream(imageFile);
+//                     OutputStream outputStream = response.getOutputStream()) {
+//                    byte[] buffer = new byte[1024];
+//                    int bytesRead;
+//                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+//                        outputStream.write(buffer, 0, bytesRead);
+//                    }
+//                }
+//            } else {
+//                System.err.println("Image not found: " + filename);
+//                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Image not found");
+//            }
+//        } else {
+//            List<Item> items = itemService.getAllItems();
+//
+//            String baseUrl = request.getRequestURL().toString();
+//            if (request.getPathInfo() != null) {
+//                baseUrl = baseUrl.replace(request.getPathInfo(), "");
+//            }
+//
+//            for (Item item : items) {
+//                item.setImageBlob(baseUrl + "/images/" + item.getImageBlob());
+//            }
+//
+//            response.setContentType("application/json");
+//            response.getWriter().write(new Gson().toJson(items));
+//        }
+//    }
+
+//    @Override
+//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        String pathInfo = request.getPathInfo();
+//
+//        if (pathInfo != null && pathInfo.startsWith("/subcategory/")) {
+//            String subcategoryIdString = pathInfo.substring("/subcategory/".length());
+//            try {
+//                int subcategoryId = Integer.parseInt(subcategoryIdString);
+//                List<Item> items = itemService.getItemsBySubcategory(subcategoryId);
+//
+//                // Prepare the response
+//                String baseUrl = request.getRequestURL().toString();
+//                if (request.getPathInfo() != null) {
+//                    baseUrl = baseUrl.replace(request.getPathInfo(), "");
+//                }
+//
+//                for (Item item : items) {
+//                    item.setImageBlob(baseUrl + "/images/" + item.getImageBlob());
+//                }
+//
+//                // Send the list of items as JSON response
+//                response.setContentType("application/json");
+//                response.getWriter().write(new Gson().toJson(items));
+//
+//            } catch (NumberFormatException e) {
+//                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid subcategory ID");
+//            }
+//        } else {
+//            // Default behavior for fetching all items or serving images
+//            List<Item> items = itemService.getAllItems();
+//
+//            String baseUrl = request.getRequestURL().toString();
+//            if (request.getPathInfo() != null) {
+//                baseUrl = baseUrl.replace(request.getPathInfo(), "");
+//            }
+//
+//            for (Item item : items) {
+//                item.setImageBlob(baseUrl + "/images/" + item.getImageBlob());
+//            }
+//
+//            response.setContentType("application/json");
+//            response.getWriter().write(new Gson().toJson(items));
+//        }
+//    }
+
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
 
-        // Serve images
+        // Serve images - separate endpoint for images
         if (pathInfo != null && pathInfo.startsWith("/images/")) {
-            String filename = pathInfo.substring("/images/".length());
-            File imageFile = new File("/Users/athiq/Downloads/images", filename);
+            serveImage(request, response, pathInfo);
+            return; // Ensure we stop further processing here if it's an image request
+        }
 
-            if (imageFile.exists()) {
-                response.setContentType("image/png");
-                try (InputStream inputStream = new FileInputStream(imageFile);
-                     OutputStream outputStream = response.getOutputStream()) {
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, bytesRead);
-                    }
-                }
-            } else {
-                System.err.println("Image not found: " + filename);
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Image not found");
-            }
-        } else {
-            List<Item> items = itemService.getAllItems();
+        if (pathInfo != null && pathInfo.startsWith("/subcategory/")) {
+            handleSubcategoryRequest(request, response, pathInfo);
+            return;
+        }
+
+        List<Item> items = itemService.getAllItems();
+        String baseUrl = request.getRequestURL().toString();
+        if (request.getPathInfo() != null) {
+            baseUrl = baseUrl.replace(request.getPathInfo(), "");
+        }
+
+        // Update imageBlob URL for each item
+        for (Item item : items) {
+            item.setImageBlob(baseUrl + "/images/" + item.getImageBlob()); // Correct image path
+        }
+
+        response.setContentType("application/json");
+        response.getWriter().write(new Gson().toJson(items));
+    }
+
+    // Handle requests for a specific subcategory
+    private void handleSubcategoryRequest(HttpServletRequest request, HttpServletResponse response, String pathInfo) throws IOException {
+        String subcategoryIdString = pathInfo.substring("/subcategory/".length());
+        try {
+            int subcategoryId = Integer.parseInt(subcategoryIdString);
+            List<Item> items = itemService.getItemsBySubcategory(subcategoryId);
+
 
             String baseUrl = request.getRequestURL().toString();
             if (request.getPathInfo() != null) {
@@ -152,14 +248,37 @@ public class ItemServlet extends HttpServlet {
             }
 
             for (Item item : items) {
-                item.setImageBlob(baseUrl + "/images/" + item.getImageBlob());
+                item.setImageBlob(baseUrl + "/images/" + item.getImageBlob()); // Correct image path
             }
 
+            // Send the list of items for the subcategory as a JSON response
             response.setContentType("application/json");
             response.getWriter().write(new Gson().toJson(items));
+
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid subcategory ID");
         }
     }
 
+    private void serveImage(HttpServletRequest request, HttpServletResponse response, String pathInfo) throws IOException {
+        String filename = pathInfo.substring("/images/".length());
+        String imagePath = "/Users/athiq/Downloads/images";
+
+        File imageFile = new File(imagePath, filename);
+        if (imageFile.exists()) {
+            response.setContentType("image/png"); // Adjust if the image type is different (e.g., jpeg)
+            try (InputStream inputStream = new FileInputStream(imageFile);
+                 OutputStream outputStream = response.getOutputStream()) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Image not found");
+        }
+    }
 
 
 }
