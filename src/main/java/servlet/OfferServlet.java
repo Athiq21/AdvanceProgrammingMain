@@ -105,4 +105,29 @@ public class OfferServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Image not found");
         }
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null && pathInfo.startsWith("/offers/")) {
+            try {
+                String idStr = pathInfo.substring("/offers/".length());
+                long offerId = Long.parseLong(idStr);
+
+                boolean success = offerService.deleteOfferById(offerId);
+
+                if (success) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write("{\"message\": \"Offer deleted successfully.\"}");
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Offer not found.");
+                }
+            } catch (NumberFormatException e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid offer ID.");
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Offer ID not specified.");
+        }
+    }
+
 }

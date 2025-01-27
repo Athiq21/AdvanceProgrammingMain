@@ -280,5 +280,26 @@ public class ItemServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            String idStr = request.getPathInfo().substring(1);
+            long itemId = Long.parseLong(idStr);
+            ItemService itemService = new ItemService();
+            boolean success = itemService.deleteItemById(itemId);
+
+            if (success) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write("ok");
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "no1");
+            }
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "no2");
+        }
+    }
+
+
+
 
 }

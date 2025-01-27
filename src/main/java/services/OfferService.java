@@ -69,4 +69,18 @@ public class OfferService implements OfferServiceImpl {
         }
         return offers;
     }
+
+    public boolean deleteOfferById(long id) {
+        String sql = "DELETE FROM offer WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error deleting offer", e);
+            return false;
+        }
+    }
+
 }

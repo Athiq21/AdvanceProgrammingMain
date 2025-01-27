@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class ItemService implements services.ItemServiceImpl {
 
     private static final Logger logger = Logger.getLogger(ItemService.class.getName());
-    private Connection connection;
+    private static Connection connection;
 
     public ItemService() {
         this.connection = DBConnection.getInstance().getConnection();
@@ -116,12 +116,12 @@ public class ItemService implements services.ItemServiceImpl {
                     item.setStatus(rs.getString("status"));
                     items.add(item);
 
-                    User user = new User();
-                    user.setId(rs.getInt("user_id"));
-                    user.setEmail(rs.getString("user_email"));
-                    user.setFirstName(rs.getString("user_firstName"));
-                    user.setLastName(rs.getString("user_lastName"));
-                    item.setUser(user);
+//                    User user = new User();
+//                    user.setId(rs.getInt("user_id"));
+//                    user.setEmail(rs.getString("user_email"));
+//                    user.setFirstName(rs.getString("user_firstName"));
+//                    user.setLastName(rs.getString("user_lastName"));
+//                    item.setUser(user);
                 }
             }
         } catch (SQLException e) {
@@ -129,6 +129,20 @@ public class ItemService implements services.ItemServiceImpl {
         }
         return items;
     }
+
+    public static boolean deleteItemById(long id) {
+        String sql = "DELETE FROM item WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error deleting item", e);
+            return false;
+        }
+    }
+
 
 
 }
