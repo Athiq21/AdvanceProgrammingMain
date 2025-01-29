@@ -34,7 +34,6 @@
       <file-size-threshold>1048576</file-size-threshold> <!-- 1MB threshold before writing to disk -->
     </multipart-config>
   </servlet>
-
   <servlet>
     <servlet-name>OfferServlet</servlet-name>
     <servlet-class>servlet.OfferServlet</servlet-class>
@@ -44,6 +43,10 @@
       <max-request-size>4194304</max-request-size>
       <file-size-threshold>1048576</file-size-threshold>
     </multipart-config>
+  </servlet>
+  <servlet>
+    <servlet-name>OrderServlet</servlet-name>
+    <servlet-class>servlet.OrderServlet</servlet-class>
   </servlet>
 <!--  <servlet>-->
 <!--    <servlet-name>SubCategoryServlet</servlet-name>-->
@@ -68,6 +71,10 @@
   <servlet-mapping>
     <servlet-name>OfferServlet</servlet-name>
     <url-pattern>/api/offer/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>OrderServlet</servlet-name>
+    <url-pattern>/api/order/*</url-pattern>
   </servlet-mapping>
 <!--  <servlet-mapping>-->
 <!--    <servlet-name>SubCategoryServlet</servlet-name>-->

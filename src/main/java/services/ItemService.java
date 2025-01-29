@@ -145,4 +145,54 @@ public class ItemService implements services.ItemServiceImpl {
 
 
 
+    public boolean updateItemStatusAndOrders(Long itemId, String status) {
+        String updateItemSql = "UPDATE item SET status = ? WHERE id = ?";
+        String updateOrderSql = "UPDATE orders SET status = 'completed' WHERE item_id = ?";
+
+        PreparedStatement stmtUpdateItem = null;
+        PreparedStatement stmtUpdateOrders = null;
+
+        try {
+            connection.setAutoCommit(false);
+
+            // Update item status
+            stmtUpdateItem = connection.prepareStatement(updateItemSql);
+            stmtUpdateItem.setString(1, status);
+            stmtUpdateItem.setLong(2, itemId);
+            int itemRowsAffected = stmtUpdateItem.executeUpdate();
+
+            // Update related orders to "completed"
+            stmtUpdateOrders = connection.prepareStatement(updateOrderSql);
+            stmtUpdateOrders.setLong(1, itemId);
+            int orderRowsAffected = stmtUpdateOrders.executeUpdate();
+
+            // Commit transaction if both updates succeed
+            if (itemRowsAffected > 0 && orderRowsAffected > 0) {
+                connection.commit();
+                return true;
+            } else {
+                connection.rollback(); // Rollback if any update fails
+                return false;
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error updating item status and order status", e);
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                logger.log(Level.SEVERE, "Error rolling back transaction", rollbackEx);
+            }
+            return false;
+        } finally {
+            try {
+                if (stmtUpdateItem != null) stmtUpdateItem.close();
+                if (stmtUpdateOrders != null) stmtUpdateOrders.close();
+                connection.setAutoCommit(true); // Reset auto-commit
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Error closing resources", e);
+            }
+        }
+    }
+
+
+
 }

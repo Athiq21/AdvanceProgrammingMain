@@ -1,5 +1,6 @@
 package servlet;
 
+import DTO.Item.UpdateRequestDTO;
 import com.google.gson.Gson;
 import model.Item;
 import services.ItemService;
@@ -44,8 +45,7 @@ public class ItemServlet extends HttpServlet {
     }
 
     private void saveItem(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        // Handle multipart form data
-        Part imagePart = request.getPart("image"); // Use "image" as the key
+        Part imagePart = request.getPart("image");
         String name = request.getParameter("name");
         String description = request.getParameter("description");
         String color = request.getParameter("color");
@@ -65,7 +65,6 @@ public class ItemServlet extends HttpServlet {
         System.out.println("Created By: " + createdBy);
         System.out.println("Image Part: " + (imagePart != null ? imagePart.getSubmittedFileName() : "No image"));
 
-        // Prepare the Item object
         Item item = new Item();
         item.setName(name);
         item.setDescription(description);
@@ -234,7 +233,6 @@ public class ItemServlet extends HttpServlet {
         response.getWriter().write(new Gson().toJson(items));
     }
 
-    // Handle requests for a specific subcategory
     private void handleSubcategoryRequest(HttpServletRequest request, HttpServletResponse response, String pathInfo) throws IOException {
         String subcategoryIdString = pathInfo.substring("/subcategory/".length());
         try {
@@ -246,12 +244,12 @@ public class ItemServlet extends HttpServlet {
             if (request.getPathInfo() != null) {
                 baseUrl = baseUrl.replace(request.getPathInfo(), "");
             }
-
-            for (Item item : items) {
-                item.setImageBlob(baseUrl + "/images/" + item.getImageBlob()); // Correct image path
+            else{
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST ,"no work");
             }
-
-            // Send the list of items for the subcategory as a JSON response
+            for (Item item : items) {
+                item.setImageBlob(baseUrl + "/images/" + item.getImageBlob());
+            }
             response.setContentType("application/json");
             response.getWriter().write(new Gson().toJson(items));
 
@@ -299,7 +297,25 @@ public class ItemServlet extends HttpServlet {
         }
     }
 
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        BufferedReader reader = request.getReader();
+        Gson gson = new Gson();
+        UpdateRequestDTO updateRequest = gson.fromJson(reader, UpdateRequestDTO.class);
 
+        if (updateRequest.getItemId() <= 0 || updateRequest.getStatus() == null || updateRequest.getStatus().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request data");
+            return;
+        }
+
+        boolean success = itemService.updateItemStatusAndOrders(updateRequest.getItemId(), updateRequest.getStatus());
+
+        if (success) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write("Item and related orders updated successfully");
+        } else {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update item status");
+        }
+    }
 
 
 }
