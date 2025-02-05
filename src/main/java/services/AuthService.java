@@ -149,10 +149,11 @@ public class AuthService {
                         if (hashedPassword != null && hashedPassword.equals(storedPassword)) {
                             if (isActivated) {
                                 String accessToken = generateJwtToken(userId, email);
-                                sendSuccessResponseWithToken(resp, accessToken, userId, email, firstName, lastName, roleId, roleName);
-                            } else {
-                                sendErrorResponse(resp, "Account not activated. Please verify your email with the OTP.");
+                                sendSuccessResponseWithToken(resp, accessToken, userId, email, firstName, lastName, isActivated, roleId, roleName);
+                            } else{
+                                sendSuccessResponseWithActivationMessage(resp, "Account not activated. Please verify your email with the OTP.");
                             }
+
                         } else {
                             sendErrorResponse(resp, "Wrong mail, pw.");
                         }
@@ -277,7 +278,7 @@ public class AuthService {
         resp.getWriter().write(message );
     }
 
-    private static void sendSuccessResponseWithToken(HttpServletResponse resp, String accessToken, int id, String email, String firstName, String lastName, int roleId, String roleName) throws IOException {
+    private static void sendSuccessResponseWithToken(HttpServletResponse resp, String accessToken, int id, String email, String firstName, String lastName, Boolean isActivated,int roleId, String roleName) throws IOException {
 //        resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/json");
         String jsonResponse = "{"
@@ -288,12 +289,27 @@ public class AuthService {
                 + "\"email\": \"" + email + "\","
                 + "\"firstName\": \"" + firstName + "\","
                 + "\"lastName\": \"" + lastName + "\","
+                + "\"Activated\": \"" + isActivated + "\","
                 + "\"roleId\": " + roleId + ","
                 + "\"roleName\": \"" + roleName + "\""
                 + "}"
                 + "}";
         resp.getWriter().write(jsonResponse);
     }
+
+    private static void sendSuccessResponseWithActivationMessage(HttpServletResponse resp, String message) throws IOException {
+        resp.setStatus(HttpServletResponse.SC_OK);  // Status code for success
+        resp.setContentType("application/json");
+
+        // Create a JSON response with the message indicating the account is not activated
+        String jsonResponse = "{"
+                + "\"message\": \"" + message + "\""
+                + "}";
+
+        // Write the JSON response to the client
+        resp.getWriter().write(jsonResponse);
+    }
+
 
     private static void sendErrorResponse(HttpServletResponse resp, String message) throws IOException {
         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
