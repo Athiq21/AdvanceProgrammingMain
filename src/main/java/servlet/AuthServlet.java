@@ -620,7 +620,7 @@ import java.io.IOException;
 
 @WebServlet("/api/auth/*")
 public class AuthServlet extends HttpServlet {
-
+//TEST MODE MAKE THE MODIFY ACCESSORS PUBLIC AND CHANGE TO PRIVATE LATER
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
