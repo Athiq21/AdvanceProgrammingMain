@@ -82,12 +82,12 @@ public class OrderService implements OrderServiceImpl {
     }
 
     public List<Order> getAllOrders(HttpServletRequest req) {
-        String sql = "SELECT o.id, o.startdate, o.enddate, o.paymentMethod, o.status " +
-                "u.id AS userId, u.firstName AS firstName,u.lastName AS lastName, " +
-                "i.id AS itemId, i.name AS itemName, i.image AS itemImage, i.price AS itemPrice " +
-                "FROM orders o " +
-                "JOIN user u ON o.user_id = u.id " +
-                "JOIN item i ON o.item_id = i.id ";
+        String sql = "SELECT o.id, o.startdate, o.enddate, o.paymentMethod, o.status,o.created_datetime, \n" +
+                "       u.id AS userId, u.firstName AS firstName, u.lastName AS lastName, \n" +
+                "       i.id AS itemId, i.name AS itemName, i.image AS itemImage, i.price AS itemPrice \n" +
+                "FROM orders o \n" +
+                "JOIN `user` u ON o.user_id = u.id \n" +
+                "JOIN item i ON o.item_id = i.id;\n";
 
         List<Order> orders = new ArrayList<>();
 
@@ -100,6 +100,9 @@ public class OrderService implements OrderServiceImpl {
                 order.setEndDate(rs.getString("enddate"));
                 order.setPaymentMethod(rs.getString("paymentMethod"));
                 order.setStatus(rs.getString("status"));
+                Timestamp createdDatetime = rs.getTimestamp("created_datetime");
+                order.setCreatedDatetime(createdDatetime);
+
 
                 User user = new User();
                 user.setId(rs.getLong("userId"));

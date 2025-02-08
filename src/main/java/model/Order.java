@@ -1,5 +1,7 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Timestamp;
 
 public class Order {
@@ -9,6 +11,7 @@ public class Order {
     private String startDate;
     private String paymentMethod;
     private String endDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp createdDatetime;
 
     private User user;

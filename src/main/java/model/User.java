@@ -13,6 +13,16 @@ public class User {
     private Timestamp otpExpiration;
     private boolean isActivated;
 
+    private Role role;
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public long getId() {
         return id;
     }

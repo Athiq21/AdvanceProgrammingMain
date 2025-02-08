@@ -132,4 +132,31 @@ public class OrderServlet extends HttpServlet {
         }
     }
 
+//    @Override
+//    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        resp.setContentType("application/json");
+//        resp.setCharacterEncoding("UTF-8");
+//
+//        String path = req.getPathInfo();
+//        Gson gson = new Gson();
+//
+//        try {
+//            if (path == null || path.equals("/all")) {
+//                List<Order> allOrders = orderService.getAllOrders(req);
+//                logger.info("Fetched " + (allOrders != null ? allOrders.size() : "null") + " orders.");
+//
+//                resp.setStatus(HttpServletResponse.SC_OK);
+//                resp.getWriter().write(gson.toJson(allOrders));
+//            } else {
+//                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+//                resp.getWriter().write("{\"error\":\"Invalid endpoint\"}");
+//            }
+//        } catch (Exception e) {
+//            logger.severe("Error processing GET request: " + e.getMessage());
+//            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//            resp.getWriter().write("{\"error\":\"An error occurred while processing your request\"}");
+//        }
+//    }
+
+
 }
