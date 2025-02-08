@@ -45,7 +45,7 @@ public class SubCategoryService implements SubCategoryServiceImpl {
             stmt.setInt(1, categoryId);
             rs = stmt.executeQuery();
 
-            // Collect the subcategories in the list
+
             while (rs.next()) {
                 SubCategory subCategory = new SubCategory();
                 subCategory.setId(rs.getInt("id"));
