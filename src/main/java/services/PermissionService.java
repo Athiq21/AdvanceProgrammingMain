@@ -35,7 +35,7 @@ public class PermissionService {
         String query = "SELECT u.id, u.email, u.firstName, u.lastName, u.isActivated, r.authority " +
                 "FROM user u " +
                 "JOIN role r ON u.role_id = r.id " +
-                "WHERE u.role_id = ?";  // Fetch users by the role_id
+                "WHERE u.role_id = ?";
 
         try (PreparedStatement stmt = c.prepareStatement(query)) {
             stmt.setInt(1, roleId);
