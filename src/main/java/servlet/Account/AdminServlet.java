@@ -35,7 +35,7 @@ public class AdminServlet extends HttpServlet {
                 handleReactivate(req, resp);
                 break;
             default:
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "NO API");
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "NO APIs");
         }
 
     }
