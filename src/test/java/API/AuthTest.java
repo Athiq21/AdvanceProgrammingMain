@@ -18,39 +18,29 @@
 //
 //    @Test
 //    void testSignup() throws IOException {
-//        // Arrange
+//
 //        HttpServletRequest request = mock(HttpServletRequest.class);
 //        HttpServletResponse response = mock(HttpServletResponse.class);
 //
-//        // Simulate the JSON body in the request
-//        String jsonBody = "{\"email\":\"test@example.com\", \"password\":\"password123\", \"firstName\":\"John\", \"lastName\":\"Doe\"}";
+//        String jsonBody = "{\"email\":\"athiq.rashiq@gmail.com\", \"password\":\"Athiq12@\", \"firstName\":\"Athiq\", \"lastName\":\"AHmeeer\"}";
 //        when(request.getReader()).thenReturn(new java.io.BufferedReader(new java.io.StringReader(jsonBody)));
 //
-//        // Mock AuthService to not perform real actions
 //        AuthService authService = mock(AuthService.class);
-//
-//        // Call the servlet method
 //        AuthServlet servlet = new AuthServlet();
 //        servlet.handleSignup(request, response);
-//
-//        // Assert (you can mock AuthService behavior and assert the right actions were called)
-//        verify(authService, times(1)).handleSignup("test@example.com", "password123", "John", "Doe", response);
+//        verify(authService, times(1)).handleSignup("athiq.rashiq@gmail.com", "Athiq12@", "Athiq", "Ahmeer", response);
 //    }
 //
 //    @Test
 //    void testSignin() throws IOException {
-//        // Arrange
 //        HttpServletRequest request = mock(HttpServletRequest.class);
 //        HttpServletResponse response = mock(HttpServletResponse.class);
 //
-//        // Simulate the JSON body in the request
 //        String jsonBody = "{\"email\":\"test@example.com\", \"password\":\"password123\"}";
 //        when(request.getReader()).thenReturn(new java.io.BufferedReader(new java.io.StringReader(jsonBody)));
 //
-//        // Mock AuthService to not perform real actions
 //        AuthService authService = mock(AuthService.class);
 //
-//        // Call the servlet method
 //        AuthServlet servlet = new AuthServlet();
 //        servlet.handleSignin(request, response);
 //
