@@ -7,8 +7,6 @@ import java.nio.file.Paths;
 public class imageUtil {
 
     private static final String IMAGE_PATH = "/Users/athiq/Downloads/images";  // Specify your image storage path
-
-    // Method to save image from Base64 string
     public String saveImage(String imageBase64) throws IOException {
         // Ensure image data is not null or empty
         if (imageBase64 == null || imageBase64.isEmpty()) {
