@@ -11,15 +11,14 @@ import java.sql.SQLException;
 public class RoleService {
 
     public void insertRolesIntoDatabase() {
-        Connection conn = null;
+        Connection c = DBConnection.getInstance().getConnection();
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try {
-            // Get database connection
-            conn = DBConnection.getConnection();
 
-            if (conn == null || conn.isClosed()) {
+
+            if (c == null || c.isClosed()) {
                 System.out.println("Database connection failed. Please try again later.");
                 return;
             }
@@ -29,7 +28,7 @@ public class RoleService {
 
             for (RoleAuthorityEnum role : RoleAuthorityEnum.values()) {
                 // Check if the role already exists in the database
-                stmt = conn.prepareStatement(queryCheck);
+                stmt = c.prepareStatement(queryCheck);
                 stmt.setString(1, role.name());  // Assuming the authority is the name of the enum
 
                 rs = stmt.executeQuery();
@@ -37,7 +36,7 @@ public class RoleService {
                     continue;
                 }
 
-                stmt = conn.prepareStatement(queryInsert);
+                stmt = c.prepareStatement(queryInsert);
                 stmt.setString(1, role.name()); // Assuming the name of the enum is used as authority
 
                 stmt.executeUpdate();
@@ -60,9 +59,9 @@ public class RoleService {
                     e.printStackTrace();
                 }
             }
-            if (conn != null) {
+            if (c != null) {
                 try {
-                    conn.close();
+                    c.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

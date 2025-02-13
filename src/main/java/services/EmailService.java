@@ -19,13 +19,6 @@ public class EmailService {
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
 
-        Session session = Session.getInstance(properties, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(smtpUser, smtpPassword);
-            }
-        });
-
         String subject = "Mega City Cab Verification";
         String body =
                 "<!DOCTYPE html>\n" +
@@ -96,13 +89,18 @@ public class EmailService {
                         "</body>\n" +
                         "</html>";
 
+        Session session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(smtpUser, smtpPassword);
+            }
+        });
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(senderEmail)); // Set the sender email address
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail)); // Set the recipient
-        message.setSubject(subject); // Set the subject
-        message.setContent(body, "text/html"); // Set the email content as HTML
+        message.setFrom(new InternetAddress(senderEmail));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+        message.setSubject(subject);
+        message.setContent(body, "text/html");
 
-        // Send the email
         Transport.send(message);
     }
 
@@ -118,13 +116,6 @@ public class EmailService {
         properties.put("mail.smtp.port", smtpPort);
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
-
-        Session session = Session.getInstance(properties, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(smtpUser, smtpPassword);
-            }
-        });
 
         String subject = "Resend OTP";
         String body =
@@ -196,13 +187,17 @@ public class EmailService {
                         "</body>\n" +
                         "</html>";
 
+        Session session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(smtpUser, smtpPassword);
+            }
+        });
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(senderEmail)); // Set the sender email address
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail)); // Set the recipient
-        message.setSubject(subject); // Set the subject
-        message.setContent(body, "text/html"); // Set the email content as HTML
-
-        // Send the email
+        message.setFrom(new InternetAddress(senderEmail));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+        message.setSubject(subject);
+        message.setContent(body, "text/html");
         Transport.send(message);
     }
 

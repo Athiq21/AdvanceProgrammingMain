@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 
 public class User {
+    private long id;
     private String email;
     private String firstName;
     private String lastName;
@@ -12,6 +13,23 @@ public class User {
     private Timestamp otpExpiration;
     private boolean isActivated;
 
+    private Role role;
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public void setEmail(String email) {
         this.email = email;
