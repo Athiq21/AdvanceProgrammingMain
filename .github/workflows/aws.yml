@@ -3,7 +3,7 @@ name: Deploy to Hostinger VPS
 on:
   push:
     branches:
-      - prod #trigger when push to branch
+      - prod # Trigger when push to the prod branch
 
 jobs:
   deploy:
@@ -21,8 +21,9 @@ jobs:
       - name: Deploy to Hostinger VPS
         run: |
           ssh -o StrictHostKeyChecking=no user@147.79.68.107 << 'EOF'
-            cd /path/to/your/project
-            git pull origin main
-            # Any other deployment steps (e.g., restart server, run build)
+            cd /var/www/vehicle
+            git pull origin prod
+            # Restart the web server (e.g., Tomcat, Nginx)
+            sudo systemctl restart tomcat9
+            # Or any additional deployment steps (e.g., npm install, mvn build)
           EOF
-
