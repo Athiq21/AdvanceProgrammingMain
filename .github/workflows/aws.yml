@@ -1,1 +1,29 @@
+name: Deploy to Hostinger VPS
 
+on:
+  push:
+    branches:
+      - prod # Trigger when push to the prod branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Deploy to Hostinger VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no user@147.79.68.107 << 'EOF'
+            cd /var/www/vehicle
+            git pull origin prod
+            # Restart the web server (e.g., Tomcat, Nginx)
+            sudo systemctl restart tomcat9
+            # Or any additional deployment steps (e.g., npm install, mvn build)
+          EOF
