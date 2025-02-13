@@ -24,6 +24,6 @@ jobs:
           # Navigate to the project directory
           cd /var/www/vehicle/AdvanceProg
           
-          # Pull the latest changes from the repository (assuming you're using Git)
-          git pull origin Dev  # Ensure you're pulling from the correct branch (Prod)
+          # HIDE ALL SECRET VARIABLES IN .ENV OR IN KEY SETTING
+          git pull origin Dev  #  (Prod)
         EOF
