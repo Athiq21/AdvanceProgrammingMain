@@ -1,0 +1,29 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches:
+      - Dev  # Branch run
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to VPS
+      run: |
+        ssh -o StrictHostKeyChecking=no root@${{ secrets.HOST }} << 'EOF'
+          # Navigate to the project directory
+          cd /var/www/vehicle/AdvanceProg
+          
+          # Pull the latest changes from the repository (assuming you're using Git)
+          git pull origin Dev  # Ensure you're pulling from the correct branch (Prod)
+        EOF
