@@ -17,11 +17,15 @@ import java.util.List;
 public class PermissionService {
 
     public static void getUsersWithRoleId1(HttpServletResponse resp) throws IOException {
-        getUsersByRoleId(resp, 1);
+        getUsersByRoleId(resp, 4);
+    }
+
+    public static void getUsersWithRoleId2(HttpServletResponse resp) throws IOException {
+        getUsersByRoleId(resp, 5);
     }
 
     public static void getUsersWithRoleId3(HttpServletResponse resp) throws IOException {
-        getUsersByRoleId(resp, 3);
+        getUsersByRoleId(resp, 6);
     }
 
     private static void getUsersByRoleId(HttpServletResponse resp, int roleId) throws IOException {
@@ -66,6 +70,7 @@ public class PermissionService {
     }
 
 
+
     public static void updateUserRole(String email, String newRole, HttpServletResponse resp) throws IOException {
         Connection c = DBConnection.getInstance().getConnection();
 
@@ -74,11 +79,12 @@ public class PermissionService {
             return;
         }
 
+        // SQL to get role ID by role name
         String getRoleIdQuery = "SELECT id FROM role WHERE authority = ?";
         String updateUserRoleQuery = "UPDATE user SET role_id = ? WHERE email = ?";
 
         try (PreparedStatement roleStmt = c.prepareStatement(getRoleIdQuery)) {
-            roleStmt.setString(1, newRole);
+            roleStmt.setString(1, newRole);  // Use role name like 'ROLE_ADMIN', 'ROLE_MODERATOR'
             ResultSet rs = roleStmt.executeQuery();
 
             if (rs.next()) {
@@ -105,6 +111,8 @@ public class PermissionService {
             sendErrorResponse(resp, "Database Error");
         }
     }
+
+
 
     private static void sendSuccessResponse(HttpServletResponse resp, Object data) throws IOException {
         resp.setContentType("application/json");
