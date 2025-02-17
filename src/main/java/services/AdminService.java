@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import JsonFormat.json;
 
 public class AdminService {
 
@@ -16,7 +17,7 @@ public class AdminService {
         Connection c = DBConnection.getInstance().getConnection();
 
         if (c == null) {
-            sendErrorResponse(resp, "DB Fail");
+            json.sendErrorResponse(resp, "DB Fail");
             return;
         }
 
@@ -37,10 +38,10 @@ public class AdminService {
                 activatedUsers.add(user);
             }
 
-            sendSuccessResponse(resp, activatedUsers);
+            json.sendSuccessResponse(resp, activatedUsers);
 
         } catch (SQLException e) {
-            sendErrorResponse(resp, "Database Error");
+            json.sendErrorResponse(resp, "Database Error");
         }
     }
 
@@ -48,7 +49,7 @@ public class AdminService {
         Connection c = DBConnection.getInstance().getConnection();
 
         if (c == null) {
-            sendErrorResponse(resp, "DB Fail");
+            json.sendErrorResponse(resp, "DB Fail");
             return;
         }
 
@@ -69,10 +70,10 @@ public class AdminService {
                 activatedUsers.add(user);
             }
 
-            sendSuccessResponse(resp, activatedUsers);
+            json.sendSuccessResponse(resp, activatedUsers);
 
         } catch (SQLException e) {
-            sendErrorResponse(resp, "Database Error");
+            json.sendErrorResponse(resp, "Database Error");
         }
     }
 
@@ -80,7 +81,7 @@ public class AdminService {
         Connection c = DBConnection.getInstance().getConnection();
 
         if (c == null) {
-            sendErrorResponse(resp, "DB Fail");
+            json.sendErrorResponse(resp, "DB Fail");
             return;
         }
 
@@ -92,13 +93,13 @@ public class AdminService {
             int rowsUpdated = stmt.executeUpdate();
 
             if (rowsUpdated > 0) {
-                sendSuccessResponse(resp, "User activated successfully.");
+                json.sendSuccessResponse(resp, "User activated successfully.");
             } else {
-                sendErrorResponse(resp, "User not found.");
+                json.sendErrorResponse(resp, "User not found.");
             }
 
         } catch (SQLException e) {
-            sendErrorResponse(resp, "Database Error");
+            json.sendErrorResponse(resp, "Database Error");
         }
     }
 
@@ -106,7 +107,7 @@ public class AdminService {
         Connection c = DBConnection.getInstance().getConnection();
 
         if (c == null) {
-            sendErrorResponse(resp, "DB Fail");
+            json.sendErrorResponse(resp, "DB Fail");
             return;
         }
 
@@ -118,13 +119,13 @@ public class AdminService {
             int rowsUpdated = stmt.executeUpdate();
 
             if (rowsUpdated > 0) {
-                sendSuccessResponse(resp, "User reactivated successfully.");
+                json.sendSuccessResponse(resp, "User reactivated successfully.");
             } else {
-                sendErrorResponse(resp, "User not found.");
+                json.sendErrorResponse(resp, "User not found.");
             }
 
         } catch (SQLException e) {
-            sendErrorResponse(resp, "Database Error");
+            json.sendErrorResponse(resp, "Database Error");
         }
     }
 

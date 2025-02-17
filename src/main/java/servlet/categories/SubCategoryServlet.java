@@ -725,16 +725,13 @@ public class SubCategoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
-
-        // If the path is null or empty or is just "/"
         if (path == null || path.isEmpty() || path.equals("/")) {
-            sa.getAllSubCategory(req, resp); // Fetch all subcategories
+            sa.getAllSubCategory(req, resp);
         } else if (path.startsWith("/category/")) {
-            // Extract categoryId from the URL path (e.g., /category/{categoryId})
             String categoryIdStr = path.substring("/category/".length());
             try {
-                int categoryId = Integer.parseInt(categoryIdStr); // Parse category ID
-                sa.getSubCategoriesByCategoryId(req, resp, categoryId); // Fetch subcategories by category ID
+                int categoryId = Integer.parseInt(categoryIdStr);
+                sa.getSubCategoriesByCategoryId(req, resp, categoryId);
             } catch (NumberFormatException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid category ID format");
             }
