@@ -28,9 +28,11 @@ public class OrderService implements OrderServiceImpl {
         //add status remov
         String sql = "INSERT INTO orders ( startdate, enddate,paymentMethod, user_id, item_id) VALUES ( ?, ?, ?, ?,?)";
         String athiqitem = "UPDATE item SET status = 'unavailable' WHERE id = ?";
+        String notification = "INSERT INTO notifications (message, createdDatetime, user_id, order_id) VALUES (?, ?, ?, ?)";
 
         PreparedStatement stmtOrder = null;
         PreparedStatement stmtUpdateItem = null;
+        PreparedStatement stmtNotification = null;
 
         try {
             connection.setAutoCommit(false);
@@ -54,6 +56,20 @@ public class OrderService implements OrderServiceImpl {
             stmtUpdateItem.setLong(1, order.getItem().getId());
             stmtUpdateItem.executeUpdate();
 
+            String notificationMessage = "Your order with the Order Number: " + order.getId() +" , and Vehicle ID: "+ order.getItem().getId()  + " has been placed successfully.";
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+
+
+
+
+
+            stmtNotification = connection.prepareStatement(notification);
+            stmtNotification.setString(1, notificationMessage);
+            stmtNotification.setTimestamp(2, timestamp);
+            stmtNotification.setLong(3, order.getUser().getId());
+            stmtNotification.setLong(4, order.getId());
+            stmtNotification.executeUpdate();
 
             connection.commit();
 
@@ -71,6 +87,9 @@ public class OrderService implements OrderServiceImpl {
                 }
                 if (stmtUpdateItem != null) {
                     stmtUpdateItem.close();
+                }
+                if (stmtNotification != null) {
+                    stmtNotification.close();
                 }
                 connection.setAutoCommit(true);
             } catch (SQLException e) {
