@@ -44,7 +44,6 @@ public class NotificationService {
                 "JOIN orders o ON n.order_id = o.id " +
                 "WHERE n.status = 'UNREAD'";
 
-
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 

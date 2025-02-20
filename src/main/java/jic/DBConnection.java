@@ -112,7 +112,6 @@ public class DBConnection {
     public DBConnection() {
         super();
     }
-
     private static void Database() {
 
     }
@@ -122,7 +121,6 @@ public class DBConnection {
         } catch (ClassNotFoundException e) {
         }
     }
-
     public static synchronized DBConnection getInstance() {
         if (dbIsntance == null) {
             dbIsntance = new DBConnection();
