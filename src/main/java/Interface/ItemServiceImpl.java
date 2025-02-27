@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface ItemServiceImpl {
     Item saveItem(Item item);
-//    Item saveItem(Item item, InputStream imageInputStream, String imageName);
 //    Item getItem(Long id);
     List<Item>getItemsBySubcategory(int subcategoryId);
     List<Item> getAllItems();
