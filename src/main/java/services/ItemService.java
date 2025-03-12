@@ -154,19 +154,16 @@ public class ItemService implements services.ItemServiceImpl {
 
         try {
             connection.setAutoCommit(false);
-
-            // Update item status
             stmtUpdateItem = connection.prepareStatement(updateItemSql);
             stmtUpdateItem.setString(1, status);
             stmtUpdateItem.setLong(2, itemId);
             int itemRowsAffected = stmtUpdateItem.executeUpdate();
 
-            // Update related orders to "completed"
             stmtUpdateOrders = connection.prepareStatement(updateOrderSql);
             stmtUpdateOrders.setLong(1, itemId);
             int orderRowsAffected = stmtUpdateOrders.executeUpdate();
 
-            // Commit transaction if both updates succeed
+
             if (itemRowsAffected > 0 && orderRowsAffected > 0) {
                 connection.commit();
                 return true;
@@ -175,18 +172,18 @@ public class ItemService implements services.ItemServiceImpl {
                 return false;
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error updating item status and order status", e);
+            logger.log(Level.SEVERE, "Error updating it", e);
             try {
                 connection.rollback();
             } catch (SQLException rollbackEx) {
-                logger.log(Level.SEVERE, "Error rolling back transaction", rollbackEx);
+                logger.log(Level.SEVERE, "Error rolling", rollbackEx);
             }
             return false;
         } finally {
             try {
                 if (stmtUpdateItem != null) stmtUpdateItem.close();
                 if (stmtUpdateOrders != null) stmtUpdateOrders.close();
-                connection.setAutoCommit(true); // Reset auto-commit
+                connection.setAutoCommit(true);
             } catch (SQLException e) {
                 logger.log(Level.SEVERE, "Error closing resources", e);
             }
