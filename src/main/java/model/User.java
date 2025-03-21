@@ -12,6 +12,25 @@ public class User {
     private String otp;
     private Timestamp otpExpiration;
     private boolean isActivated;
+    private String phone; // Add this field
+    private String nic;
+
+
+    public String getNic() {
+        return nic;
+    }
+
+    public void setNic(String nic) {
+        this.nic = nic;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     private Role role;
 

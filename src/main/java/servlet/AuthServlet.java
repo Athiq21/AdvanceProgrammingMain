@@ -651,14 +651,17 @@ public class AuthServlet extends HttpServlet {
     }
 
     private void handleSignup(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        JSONObject jsonObject = getJsonFromRequest(req);
+          JSONObject jsonObject = getJsonFromRequest(req);
         String email = jsonObject.optString("email");
-        String password = jsonObject.optString("password");
-        String firstName = jsonObject.optString("firstName");
+          String password = jsonObject.optString("password");
+             String firstName = jsonObject.optString("firstName");
         String lastName = jsonObject.optString("lastName");
+             String nic = jsonObject.optString("nic");
+                String phone = jsonObject.optString("phone");
 
-        AuthService.handleSignup(email, password, firstName, lastName, resp);
+        AuthService.handleSignup(email, password, firstName, lastName, nic, phone, resp);
     }
+
 
     private void handleSignin(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         JSONObject jsonObject = getJsonFromRequest(req);

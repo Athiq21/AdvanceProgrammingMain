@@ -144,6 +144,28 @@ public class ItemService implements services.ItemServiceImpl {
     }
 
 
+    public boolean updateItem(Item item) {
+        String sql = "UPDATE item SET name = ?, description = ?, color = ?, mileage = ?, transmission = ?, fueltype = ?, price = ?, status = ? WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, item.getName());
+            stmt.setString(2, item.getDescription());
+            stmt.setString(3, item.getColor());
+            stmt.setString(4, item.getMileage());
+            stmt.setString(5, item.getTransmission());
+            stmt.setString(6, item.getFuelType());
+            stmt.setString(7, item.getPrice());
+            stmt.setString(8, item.getStatus());
+            stmt.setLong(9, item.getId());
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error updating item", e);
+            return false;
+        }
+    }
+
 
     public boolean updateItemStatusAndOrders(Long itemId, String status) {
         String updateItemSql = "UPDATE item SET status = ? WHERE id = ?";

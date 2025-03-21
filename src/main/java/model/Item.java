@@ -31,6 +31,11 @@ public class Item {
     private SubCategory subCategory;
     private User user;
 
+    private Long driverId;
+
+    public Long getDriverId() { return driverId; }
+    public void setDriverId(Long driverId) { this.driverId = driverId; }
+
     public User getUser() {
         return user;
     }

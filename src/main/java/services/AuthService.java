@@ -76,7 +76,7 @@ public class AuthService {
         }
     }
 
-    public static void handleSignup(String email, String password, String firstName, String lastName, HttpServletResponse resp) throws IOException {
+    public static void handleSignup(String email, String password, String firstName, String lastName,String phonenumber,String nic, HttpServletResponse resp) throws IOException {
         if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
             sendErrorResponse(resp, "Email, password, first name, and last name are required.");
             return;
@@ -106,7 +106,7 @@ public class AuthService {
 
             int roleId = getRoleId(c, "ROLE_USER");
 
-            insertUser(c, email, Upper2PW, firstName, lastName, otp, otpExpiration, roleId);
+            insertUser(c, email, Upper2PW, firstName, lastName, otp, otpExpiration, roleId,nic,phonenumber);
 
             EmailService emailService = new EmailService();
             emailService.sendOtpEmail(email, otp, otpExpiration);
@@ -219,8 +219,23 @@ public class AuthService {
         }
     }
 
-    private static void insertUser(Connection c, String email, String Upper2PW, String firstName, String lastName, String otp, Timestamp otpExpiration, int roleId) throws SQLException {
-        String query = "INSERT INTO user (email, password, firstName, lastName, otp, otpExpiration, role_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+//    private static void insertUser(Connection c, String email, String Upper2PW, String firstName, String lastName, String otp, Timestamp otpExpiration, int roleId) throws SQLException {
+//        String query = "INSERT INTO user (email, password, firstName, lastName, otp, otpExpiration, role_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+//        try (PreparedStatement stmt = c.prepareStatement(query)) {
+//            stmt.setString(1, email);
+//            stmt.setString(2, Upper2PW);
+//            stmt.setString(3, firstName);
+//            stmt.setString(4, lastName);
+//            stmt.setString(5, otp);
+//            stmt.setTimestamp(6, otpExpiration);
+//            stmt.setInt(7, roleId);
+//            stmt.executeUpdate();
+//        }
+//    }
+
+    private static void insertUser(Connection c, String email, String Upper2PW, String firstName, String lastName, String otp,
+                                   Timestamp otpExpiration, int roleId, String nic, String phone) throws SQLException {
+        String query = "INSERT INTO user (email, password, firstName, lastName, otp, otpExpiration, role_id, nic, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = c.prepareStatement(query)) {
             stmt.setString(1, email);
             stmt.setString(2, Upper2PW);
@@ -229,9 +244,12 @@ public class AuthService {
             stmt.setString(5, otp);
             stmt.setTimestamp(6, otpExpiration);
             stmt.setInt(7, roleId);
+            stmt.setString(8, nic);
+            stmt.setString(9, phone);
             stmt.executeUpdate();
         }
     }
+
 
     private static int getRoleId(Connection c, String roleName) throws SQLException {
         String query = "SELECT id FROM role WHERE authority = ?";
